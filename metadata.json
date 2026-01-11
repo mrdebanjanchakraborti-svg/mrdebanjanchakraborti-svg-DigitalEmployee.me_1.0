@@ -1,0 +1,8 @@
+{
+  "name": "DigitalEmployee.me_1.0",
+  "description": "High-end conversion-focused website for a GenAI tool development company providing 'Digital Employees' for local businesses.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

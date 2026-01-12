@@ -1,4 +1,6 @@
+
 import React, { useState } from 'react';
+import { supabase } from '../supabase';
 
 interface PartnerPageProps {
   onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner') => void;
@@ -6,6 +8,14 @@ interface PartnerPageProps {
 
 const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    city: '',
+    category: ''
+  });
 
   const tiers = [
     {
@@ -47,9 +57,36 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormSubmitted(true);
+    setLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('partners')
+        .insert([{
+          full_name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          city: formData.city,
+          category: formData.category,
+          status: 'pending',
+          applied_at: new Date().toISOString()
+        }]);
+
+      if (error) throw error;
+      setFormSubmitted(true);
+    } catch (err) {
+      console.error('Partner submission error:', err);
+      alert('There was an error submitting your partner application.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -258,28 +295,28 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
-                    <input required type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
+                    <input required name="fullName" value={formData.fullName} onChange={handleChange} type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Email ID</label>
-                    <input required type="email" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
+                    <input required name="email" value={formData.email} onChange={handleChange} type="email" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">WhatsApp Number</label>
-                    <input required type="tel" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
+                    <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">City / Pin Code</label>
-                    <input required type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
+                    <input required name="city" value={formData.city} onChange={handleChange} type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">I am a...</label>
-                  <select required className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors">
+                  <select required name="category" value={formData.category} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors">
                     <option value="">Select Category</option>
                     <option>Marketing Agency</option>
                     <option>Freelancer</option>
@@ -289,8 +326,12 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
                   </select>
                 </div>
 
-                <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white py-6 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-red-600/20 active:scale-95">
-                  Submit Application
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900 text-white py-6 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-red-600/20 active:scale-95 flex items-center justify-center"
+                >
+                  {loading ? 'Processing...' : 'Submit Application'}
                 </button>
                 <p className="text-[10px] text-slate-600 text-center mt-6 font-bold uppercase tracking-widest">
                   Secure Onboarding • partners@digitalemployee.me

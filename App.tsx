@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
+import { supabase } from './supabase';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -15,10 +17,28 @@ import ServicesPage from './components/ServicesPage';
 import WhyPage from './components/WhyPage';
 import PricingPage from './components/PricingPage';
 import PartnerPage from './components/PartnerPage';
+import Auth from './components/Auth';
 
 const App: React.FC = () => {
   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [user, setUser] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner'>('home');
+
+  useEffect(() => {
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Handle hash changes for navigation
   useEffect(() => {
@@ -68,10 +88,22 @@ const App: React.FC = () => {
     }
   };
 
+  const handleOpenAuth = (mode: 'login' | 'signup') => {
+    setAuthMode(mode);
+    setIsAuthOpen(true);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 selection:bg-red-500/30">
       <Header 
         onOpenVoice={() => setIsVoiceOpen(true)} 
+        onOpenAuth={handleOpenAuth}
+        onLogout={handleLogout}
+        user={user}
         onNavigate={navigateTo}
         currentPage={currentPage}
       />
@@ -96,11 +128,17 @@ const App: React.FC = () => {
         {currentPage === 'partner' && <PartnerPage onNavigate={navigateTo} />}
       </main>
       
-      <Footer onNavigate={navigateTo} />
+      <Footer onNavigate={navigateTo} onOpenAuth={handleOpenAuth} user={user} />
 
       <VoiceAssistant 
         isOpen={isVoiceOpen} 
         onClose={() => setIsVoiceOpen(false)} 
+      />
+
+      <Auth 
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        initialMode={authMode}
       />
     </div>
   );

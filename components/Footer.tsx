@@ -1,10 +1,13 @@
+
 import React from 'react';
 
 interface FooterProps {
   onNavigate?: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner') => void;
+  onOpenAuth?: (mode: 'login' | 'signup') => void;
+  user?: any;
 }
 
-const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAuth, user }) => {
   const socialLinks = [
     {
       name: 'X',
@@ -100,11 +103,17 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-6">Company</h4>
+            <h4 className="font-bold text-white mb-6">Account</h4>
             <ul className="space-y-4 text-slate-500 text-sm">
+              {!user ? (
+                <>
+                  <li><button onClick={() => onOpenAuth?.('login')} className="hover:text-red-500 transition-colors">Login</button></li>
+                  <li><button onClick={() => onOpenAuth?.('signup')} className="hover:text-red-500 transition-colors">Sign Up</button></li>
+                </>
+              ) : (
+                <li><a href="#" className="hover:text-red-500 transition-colors">My Dashboard</a></li>
+              )}
               <li><button onClick={(e) => handleLinkClick(e, 'about')} className="hover:text-red-500 transition-colors">About Us</button></li>
-              <li><a href="#" className="hover:text-red-500 transition-colors">Case Studies</a></li>
-              <li><a href="#" className="hover:text-red-500 transition-colors">Careers</a></li>
               <li><a href="#contact" className="hover:text-red-500 transition-colors">Contact</a></li>
             </ul>
           </div>

@@ -1,7 +1,10 @@
+
 import React, { useState } from 'react';
+import { supabase } from '../supabase';
 
 const Contact: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -20,15 +23,35 @@ const Contact: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic for Google Sheets / AI Studio endpoint would go here
-    console.log('Dispatching Deployment Request:', {
-      ...formData,
-      submitted_at: new Date().toISOString(),
-      source: "Website - Deployment Request"
-    });
-    setSubmitted(true);
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('contacts')
+        .insert([{
+          full_name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          city: formData.city,
+          industry: formData.industry,
+          company: formData.company,
+          website: formData.website,
+          interest: formData.interest,
+          contact_time: formData.contactTime,
+          requirements: formData.requirements,
+          submitted_at: new Date().toISOString()
+        }]);
+
+      if (error) throw error;
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Submission error:', err);
+      alert('There was an error submitting your request. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,7 +80,7 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Direct Priority Line</div>
-                    <div className="text-lg font-bold text-white tracking-tight">(555) 123-4567</div>
+                    <div className="text-lg font-bold text-white tracking-tight">+91 9477417641</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-6 group">
@@ -155,8 +178,12 @@ const Contact: React.FC = () => {
                       </select>
                     </div>
                     <div className="flex items-end">
-                       <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all shadow-xl shadow-red-600/30 active:scale-95">
-                        Schedule Audit Session
+                       <button 
+                        type="submit" 
+                        disabled={loading}
+                        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all shadow-xl shadow-red-600/30 active:scale-95 flex items-center justify-center"
+                       >
+                        {loading ? 'Submitting...' : 'Schedule Audit Session'}
                       </button>
                     </div>
                   </div>

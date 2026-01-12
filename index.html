@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
       :root {
         color-scheme: dark;
@@ -19,16 +19,17 @@
         padding: 0;
         width: 100%;
         min-height: 100vh;
-        background-color: #020617 !important; /* Force background to prevent white screen */
+        background-color: #020617 !important;
         color: #f8fafc;
         overflow-x: hidden;
+        font-family: 'Inter', sans-serif;
       }
       #root {
         min-height: 100vh;
         display: block;
       }
       .gradient-text {
-        background: linear-gradient(to right, #f87171, #dc2626, #991b1b);
+        background: linear-gradient(to right, #f87171, #dc2626);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -60,6 +61,7 @@
     "react-dom": "https://esm.sh/react-dom@19.0.0",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
     "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
     "path": "https://esm.sh/path@^0.12.7",

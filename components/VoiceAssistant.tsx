@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } from '@google/genai';
 
@@ -200,14 +199,14 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose }) => {
 
           If something is not listed:
           • Say you don’t have that information.
-          • Guide the visitor to book a free session or call the DigitalEmployee.me website at (555) 123-4567.
+          • Guide the visitor to book a free session or call the DigitalEmployee.me website at +91 9477417641.
 
           Tone: Friendly, Professional, Short answers, Conversion-focused.
 
           BUSINESS INFORMATION:
           - Name: DigitalEmployee.me
           - Address: 123 Fitness Blvd, Downtown District, City 90210.
-          - Phone: (555) 123-4567.
+          - Phone: +91 9477417641.
           - Opening Hours: Mon–Fri: 5:00 AM – 11:00 PM, Sat–Sun: 7:00 AM – 9:00 PM.
           - Status: Accepting New Members for 2026.
 

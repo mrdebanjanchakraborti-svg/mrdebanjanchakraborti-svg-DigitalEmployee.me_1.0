@@ -17,6 +17,7 @@ import ServicesPage from './components/ServicesPage';
 import WhyPage from './components/WhyPage';
 import PricingPage from './components/PricingPage';
 import PartnerPage from './components/PartnerPage';
+import ROIPage from './components/ROIPage';
 import Auth from './components/Auth';
 
 const App: React.FC = () => {
@@ -24,7 +25,7 @@ const App: React.FC = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [user, setUser] = useState<any>(null);
-  const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi'>('home');
 
   useEffect(() => {
     // Check active session
@@ -59,6 +60,9 @@ const App: React.FC = () => {
       } else if (hash === '#partner-page') {
         setCurrentPage('partner');
         window.scrollTo(0, 0);
+      } else if (hash === '#roi-page') {
+        setCurrentPage('roi');
+        window.scrollTo(0, 0);
       } else {
         setCurrentPage('home');
       }
@@ -70,7 +74,7 @@ const App: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const navigateTo = (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner') => {
+  const navigateTo = (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi') => {
     if (page === 'about') {
       window.location.hash = 'about-page';
     } else if (page === 'services') {
@@ -81,6 +85,8 @@ const App: React.FC = () => {
       window.location.hash = 'pricing-page';
     } else if (page === 'partner') {
       window.location.hash = 'partner-page';
+    } else if (page === 'roi') {
+      window.location.hash = 'roi-page';
     } else {
       window.location.hash = '';
       setCurrentPage('home');
@@ -126,6 +132,7 @@ const App: React.FC = () => {
         {currentPage === 'why' && <WhyPage onNavigate={navigateTo} />}
         {currentPage === 'pricing' && <PricingPage onNavigate={navigateTo} />}
         {currentPage === 'partner' && <PartnerPage onNavigate={navigateTo} />}
+        {currentPage === 'roi' && <ROIPage onNavigate={navigateTo} />}
       </main>
       
       <Footer onNavigate={navigateTo} onOpenAuth={handleOpenAuth} user={user} />

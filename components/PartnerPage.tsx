@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabase';
 
+// Replace with your actual Google Apps Script Web App URL from Step 1
+const GOOGLE_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycby5tXf8_R6Z-I_YqG-x_L-Y8_Z_Z_Z_Z_Z/exec';
+
 interface PartnerPageProps {
   onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner') => void;
 }
@@ -62,24 +65,52 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const syncToGoogleSheet = async (data: any) => {
+    try {
+      await fetch(GOOGLE_SHEET_SYNC_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, sheetType: 'partner' })
+      });
+    } catch (err) {
+      console.error('Google Sheet Sync Failed:', err);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    const appliedAt = new Date().toISOString();
+    const payload = {
+      full_name: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      city: formData.city,
+      category: formData.category,
+      status: 'pending',
+      applied_at: appliedAt
+    };
+
     try {
+      // 1. Save to Supabase
       const { error } = await supabase
         .from('partners')
-        .insert([{
-          full_name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          city: formData.city,
-          category: formData.category,
-          status: 'pending',
-          applied_at: new Date().toISOString()
-        }]);
+        .insert([payload]);
 
       if (error) throw error;
+
+      // 2. Sync to Google Sheets
+      await syncToGoogleSheet({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        category: formData.category,
+        appliedAt: appliedAt
+      });
+
       setFormSubmitted(true);
     } catch (err) {
       console.error('Partner submission error:', err);

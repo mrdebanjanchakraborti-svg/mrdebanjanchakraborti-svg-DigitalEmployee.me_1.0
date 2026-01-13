@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabase';
 
+// Replace with your actual Google Apps Script Web App URL from Step 1
+const GOOGLE_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycby5tXf8_R6Z-I_YqG-x_L-Y8_Z_Z_Z_Z_Z/exec';
+
 const Contact: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,26 +24,58 @@ const Contact: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const syncToGoogleSheet = async (data: any) => {
+    try {
+      // Use no-cors mode if the script is simple, or standard fetch for full response
+      await fetch(GOOGLE_SHEET_SYNC_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Redirects in Google Apps Script often trigger CORS issues in browser
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, sheetType: 'contact' })
+      });
+    } catch (err) {
+      console.error('Google Sheet Sync Failed:', err);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
+    const submittedAt = new Date().toISOString();
+    const payload = {
+      full_name: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      city: formData.city,
+      industry: formData.industry,
+      company: formData.company,
+      interest: formData.interest,
+      requirements: formData.requirements,
+      submitted_at: submittedAt
+    };
+
     try {
+      // 1. Save to Supabase
       const { error } = await supabase
         .from('contacts')
-        .insert([{
-          full_name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          city: formData.city,
-          industry: formData.industry,
-          company: formData.company,
-          interest: formData.interest,
-          requirements: formData.requirements,
-          submitted_at: new Date().toISOString()
-        }]);
+        .insert([payload]);
 
       if (error) throw error;
+
+      // 2. Sync to Google Sheets
+      await syncToGoogleSheet({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        industry: formData.industry,
+        company: formData.company,
+        interest: formData.interest,
+        requirements: formData.requirements,
+        submittedAt: submittedAt
+      });
+
       setSubmitted(true);
     } catch (err) {
       console.error('Submission error:', err);

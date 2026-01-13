@@ -55,10 +55,13 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-24 bg-slate-950">
+    <section id="contact" className="py-24 bg-slate-950 relative">
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border border-white/5">
+        <div className="bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border border-white/5 relative">
           <div className="grid lg:grid-cols-5">
+            
             {/* Sidebar Info */}
             <div className="lg:col-span-2 p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-slate-900 to-slate-950 flex flex-col justify-center border-r border-white/5">
               <div className="mb-10">
@@ -107,6 +110,7 @@ const Contact: React.FC = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-8">
+                  
                   {/* Row 1: Identity */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
@@ -119,40 +123,42 @@ const Contact: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Row 2: The Core "3-Column Table" Fields */}
+                  {/* Row 2: Lead Segmentation Fields (Requested) */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
+                    <div className="md:col-span-1">
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Mobile (with Country Code)</label>
                       <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" placeholder="+91 98765 43210" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
                     </div>
-                    <div>
+                    <div className="md:col-span-1">
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">City</label>
-                      <input required name="city" value={formData.city} onChange={handleChange} type="text" placeholder="Palo Alto / Mumbai" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
+                      <input required name="city" value={formData.city} onChange={handleChange} type="text" placeholder="e.g. Mumbai, New York" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
                     </div>
-                    <div>
+                    <div className="md:col-span-1">
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Select Industry</label>
-                      <select required name="industry" value={formData.industry} onChange={handleChange} className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium appearance-none">
-                        <option value="">Choose Sector</option>
-                        <option>Healthcare & Medical</option>
-                        <option>Real Estate & Development</option>
-                        <option>Financial & Professional Services</option>
-                        <option>Retail & E-commerce</option>
-                        <option>Food & Hospitality</option>
-                        <option>Education & Training</option>
-                        <option>Home & Field Services</option>
-                      </select>
+                      <div className="relative">
+                        <select required name="industry" value={formData.industry} onChange={handleChange} className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium appearance-none">
+                          <option value="">Choose Sector</option>
+                          <option>Healthcare & Medical</option>
+                          <option>Real Estate & Development</option>
+                          <option>Financial & Professional Services</option>
+                          <option>Retail & E-commerce</option>
+                          <option>Food & Hospitality</option>
+                          <option>Education & Training</option>
+                          <option>Home & Field Services</option>
+                          <option>Other</option>
+                        </select>
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   {/* Row 3: Business Context */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Company Name</label>
-                      <input required name="company" value={formData.company} onChange={handleChange} type="text" placeholder="InFlow Ltd." className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Website URL</label>
-                      <input name="website" value={formData.website} onChange={handleChange} type="url" placeholder="https://..." className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
+                      <input required name="company" value={formData.company} onChange={handleChange} type="text" placeholder="Company Ltd." className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Plan of Interest</label>
@@ -167,31 +173,23 @@ const Contact: React.FC = () => {
                   </div>
 
                   {/* Row 4: Preferences */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Preferred Contact Time</label>
-                      <select name="contactTime" value={formData.contactTime} onChange={handleChange} className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium appearance-none">
-                        <option value="">Anytime</option>
-                        <option>Morning (9 AM - 12 PM)</option>
-                        <option>Afternoon (12 PM - 4 PM)</option>
-                        <option>Evening (4 PM - 7 PM)</option>
-                      </select>
-                    </div>
-                    <div className="flex items-end">
-                       <button 
-                        type="submit" 
-                        disabled={loading}
-                        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all shadow-xl shadow-red-600/30 active:scale-95 flex items-center justify-center"
-                       >
-                        {loading ? 'Submitting...' : 'Schedule Audit Session'}
-                      </button>
-                    </div>
-                  </div>
-
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Workflow Requirements / Pain Points</label>
-                    <textarea name="requirements" value={formData.requirements} onChange={handleChange} placeholder="e.g. Need WhatsApp automation for clinic recalls..." className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-5 text-white focus:outline-none focus:border-red-500 transition-all h-32 resize-none font-medium placeholder:text-slate-800"></textarea>
+                    <textarea name="requirements" value={formData.requirements} onChange={handleChange} placeholder="e.g. Need WhatsApp automation for clinic recalls, or lead scoring for property inquiries..." className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-5 text-white focus:outline-none focus:border-red-500 transition-all h-32 resize-none font-medium placeholder:text-slate-800"></textarea>
                   </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900 text-white py-6 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all shadow-xl shadow-red-600/30 active:scale-95 flex items-center justify-center"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-3">
+                        <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        Processing Submission...
+                      </span>
+                    ) : 'Schedule Audit Session'}
+                  </button>
 
                   <p className="text-[10px] text-slate-600 text-center font-bold uppercase tracking-widest border-t border-white/5 pt-6">
                     Direct Sync with InFlow Revenue OS • ISO 27001 Cloud Standard

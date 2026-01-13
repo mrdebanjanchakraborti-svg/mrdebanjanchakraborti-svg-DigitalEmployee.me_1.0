@@ -96,14 +96,22 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(108,40,255,0.08)_0,transparent_70%)]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <div className="mb-12 inline-block">
-            <div className="w-24 h-24 glass-card rounded-full flex items-center justify-center mx-auto text-5xl shadow-2xl animate-pulse">🤝</div>
+            <div className="w-32 h-32 bg-slate-900/50 border border-white/5 rounded-full flex items-center justify-center mx-auto text-5xl shadow-2xl animate-pulse backdrop-blur-sm">
+              🤝
+            </div>
           </div>
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 leading-[0.9] tracking-tighter">
-            Partner With Us — <span className="gradient-text">Bring the Digital Workforce.</span>
+          
+          <h1 className="flex flex-col items-center text-[52px] sm:text-7xl lg:text-[110px] font-black leading-[1] tracking-tighter mb-10">
+            <span className="text-white">Partner With Us</span>
+            <span className="text-red-500 mt-2">— Bring the</span>
+            <span className="text-red-500">Digital</span>
+            <span className="text-red-500">Workforce.</span>
           </h1>
+
           <p className="text-xl sm:text-2xl text-slate-400 max-w-3xl mx-auto mb-16 font-light leading-relaxed">
             Join the fastest-growing automation network. Provide <span className="text-white font-bold">Digital Employees</span> to businesses and earn lifetime recurring revenue that grows as you scale.
           </p>
+          
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <button 
               onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}

@@ -11,20 +11,20 @@ const Hero: React.FC<HeroProps> = ({ onOpenVoice }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center flex flex-col items-center">
           {/* Centered Badge */}
-          <div className="inline-block px-6 py-2 rounded-full bg-slate-900/50 border border-red-500/30 text-red-500 text-[10px] font-black mb-10 animate-fade-in uppercase tracking-[0.3em] backdrop-blur-sm">
+          <div className="inline-block px-6 py-2 rounded-full bg-slate-900/50 border border-red-500/30 text-red-500 text-[10px] font-black mb-12 animate-fade-in uppercase tracking-[0.3em] backdrop-blur-sm">
             Silicon Valley Standard AI Deployment
           </div>
 
-          {/* Centered Main Heading */}
-          <h1 className="text-5xl sm:text-7xl lg:text-[110px] font-black text-white mb-10 leading-[1] tracking-tighter animate-fade-in">
-            Hire Your Next <br/>
-            <span className="inline-block bg-red-600 px-6 py-2 mt-2 transform -skew-x-2">Digital Employee.</span>
+          {/* Screenshot-Style Stacked Heading */}
+          <h1 className="flex flex-col items-center text-[52px] sm:text-7xl lg:text-[110px] font-black leading-[1] tracking-tighter mb-10 animate-fade-in">
+            <span className="text-white">Hire Your Next</span>
+            <span className="text-red-500 mt-2">— Digital</span>
+            <span className="text-red-500">Employee.</span>
           </h1>
 
           {/* Centered Subtext */}
           <p className="text-xl sm:text-2xl text-slate-400 mb-14 font-light leading-relaxed animate-fade-in max-w-4xl" style={{ animationDelay: '0.1s' }}>
-            Scale your local business with autonomous AI agents that handle bookings, 
-            customer support, and lead generation 24/7.
+            Join the fastest-growing automation network. Scale your local business with <span className="text-white font-bold">Digital Employees</span> that handle bookings, customer support, and lead generation 24/7.
           </p>
 
           {/* Centered Buttons */}
@@ -46,9 +46,9 @@ const Hero: React.FC<HeroProps> = ({ onOpenVoice }) => {
         </div>
       </div>
 
-      {/* Centered Background Glow */}
+      {/* Background Decor */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 opacity-30 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-red-600/10 blur-[150px] rounded-full"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] bg-red-600/5 blur-[180px] rounded-full"></div>
       </div>
     </section>
   );

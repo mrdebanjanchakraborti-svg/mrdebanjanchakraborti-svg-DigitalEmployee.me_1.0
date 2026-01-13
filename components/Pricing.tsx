@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { PricingPlanProps } from '../types';
 
@@ -112,14 +113,6 @@ const Pricing: React.FC = () => {
           {plans.map((plan, i) => (
             <PlanCard key={i} {...plan} />
           ))}
-        </div>
-
-        <div className="mt-12 text-center">
-            <div className="inline-block p-8 rounded-3xl bg-slate-900 border border-slate-800 max-w-2xl">
-                <h4 className="text-xl font-bold text-white mb-2">Partner with us</h4>
-                <p className="text-slate-400 text-sm mb-4">₹35,500 per month + ₹1,50,000 for 1st month. For multi-location franchises or large-scale retail chains needing bespoke neural architecture.</p>
-                <a href="#contact" className="text-red-500 font-black text-xs uppercase tracking-widest hover:text-red-400 transition-colors">Contact for Bespoke Quote &rarr;</a>
-            </div>
         </div>
       </div>
     </section>

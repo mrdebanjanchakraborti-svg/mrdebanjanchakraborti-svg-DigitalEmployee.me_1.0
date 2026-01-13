@@ -19,13 +19,14 @@ import PricingPage from './components/PricingPage';
 import PartnerPage from './components/PartnerPage';
 import ROIPage from './components/ROIPage';
 import Auth from './components/Auth';
+import ResetPasswordPage from './components/ResetPasswordPage';
 
 const App: React.FC = () => {
   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgot' | 'update'>('login');
   const [user, setUser] = useState<any>(null);
-  const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password'>('home');
 
   useEffect(() => {
     // Check active session
@@ -34,17 +35,37 @@ const App: React.FC = () => {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      
+      // If we detect a password recovery event, lock the app into reset mode
+      if (event === 'PASSWORD_RECOVERY') {
+        setCurrentPage('reset-password');
+        setIsAuthOpen(false); // Close modal to show the page
+        window.location.hash = 'reset-password';
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle hash changes for navigation
+  // Handle hash changes for navigation and auth flows
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
+      
+      // Detailed Supabase Recovery Detection
+      if (
+        hash.includes('reset-password') || 
+        hash.includes('type=recovery') || 
+        hash.includes('access_token=') && hash.includes('type=recovery')
+      ) {
+        setCurrentPage('reset-password');
+        setIsAuthOpen(false); // CRITICAL: Close the auth modal if it was open
+        return;
+      }
+
+      // Standard Page Routing
       if (hash === '#about-page') {
         setCurrentPage('about');
         window.scrollTo(0, 0);
@@ -69,12 +90,12 @@ const App: React.FC = () => {
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    handleHashChange(); // Initial check
+    handleHashChange(); // Run on mount to catch incoming links
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const navigateTo = (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi') => {
+  const navigateTo = (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => {
     if (page === 'about') {
       window.location.hash = 'about-page';
     } else if (page === 'services') {
@@ -87,6 +108,8 @@ const App: React.FC = () => {
       window.location.hash = 'partner-page';
     } else if (page === 'roi') {
       window.location.hash = 'roi-page';
+    } else if (page === 'reset-password') {
+      window.location.hash = 'reset-password';
     } else {
       window.location.hash = '';
       setCurrentPage('home');
@@ -94,7 +117,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleOpenAuth = (mode: 'login' | 'signup') => {
+  const handleOpenAuth = (mode: 'login' | 'signup' | 'forgot' | 'update') => {
     setAuthMode(mode);
     setIsAuthOpen(true);
   };
@@ -133,6 +156,7 @@ const App: React.FC = () => {
         {currentPage === 'pricing' && <PricingPage onNavigate={navigateTo} />}
         {currentPage === 'partner' && <PartnerPage onNavigate={navigateTo} />}
         {currentPage === 'roi' && <ROIPage onNavigate={navigateTo} />}
+        {currentPage === 'reset-password' && <ResetPasswordPage onNavigate={navigateTo} />}
       </main>
       
       <Footer onNavigate={navigateTo} onOpenAuth={handleOpenAuth} user={user} />

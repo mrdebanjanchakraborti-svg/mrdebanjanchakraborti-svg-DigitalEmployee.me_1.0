@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 interface PricingPageProps {
@@ -67,6 +68,49 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigate }) => {
     }
   ];
 
+  const comparisonData = [
+    {
+      category: "Platform Access",
+      features: [
+        { name: "User Seats", values: ["1", "2", "5", "10", "Unlimited"] },
+        { name: "Active Workflows", values: ["1", "3", "Unlimited", "Unlimited", "Unlimited"] },
+        { name: "Omnichannel Inbox", values: [true, true, true, true, true] },
+        { name: "Custom Dashboards", values: [false, false, true, true, true] },
+        { name: "Mobile App Access", values: [true, true, true, true, true] },
+      ]
+    },
+    {
+      category: "Channels & Communication",
+      features: [
+        { name: "Email Automation", values: [true, true, true, true, true] },
+        { name: "SMS Messaging", values: [true, true, true, true, true] },
+        { name: "WhatsApp Business API", values: ["Limited", "Full", "Full", "Full", "Full"] },
+        { name: "AI Voice Calling", values: [false, false, false, true, true] },
+        { name: "Social Auto-Poster", values: [false, true, true, true, true] },
+      ]
+    },
+    {
+      category: "Intelligence & Scale",
+      features: [
+        { name: "AI Content Generation", values: [false, "Basic", "Advanced", "Full", "Full"] },
+        { name: "Lead Scoring", values: [false, false, "Standard", "Advanced", "Advanced"] },
+        { name: "AI Image Generation", values: [false, false, true, true, true] },
+        { name: "Smart Retargeting", values: [false, false, true, true, true] },
+        { name: "Webhooks & API", values: [false, "Basic", "Advanced", "Advanced", "Custom"] },
+      ]
+    },
+    {
+      category: "Support & Security",
+      features: [
+        { name: "Onboarding Support", values: ["Self", "Guided", "Assisted", "Dedicated", "Enterprise"] },
+        { name: "SLA Guarantee", values: [false, false, false, "99.9%", "99.99%"] },
+        { name: "Security Standards", values: ["Standard", "Standard", "SOC2/HIPAA", "Enterprise", "Bespoke"] },
+        { name: "Priority Response", values: [false, false, true, true, true] },
+        { name: "Account Manager", values: [false, false, false, true, true] },
+      ]
+    }
+  ];
+
   const creditRules = [
     { action: "Send WhatsApp Message", cost: "1 Credit" },
     { action: "Send SMS", cost: "1 Credit" },
@@ -120,52 +164,70 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* 2. Pricing Tiers */}
-      <section className="py-24 bg-slate-950/50">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-nowrap lg:grid lg:grid-cols-5 gap-6 overflow-x-auto pb-8 snap-x no-scrollbar">
-            {plans.map((plan, i) => (
-              <div 
-                key={i} 
-                className={`flex-shrink-0 w-[300px] lg:w-auto snap-center relative glass-card rounded-[2.5rem] p-1 border-white/5 transition-all hover:-translate-y-2 group ${plan.recommended ? 'scale-105 z-10 border-[#06E4DA]/40 shadow-[0_0_50px_rgba(6,228,218,0.1)]' : ''}`}
-              >
-                {plan.recommended && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#06E4DA] text-slate-950 px-6 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl shadow-[#06E4DA]/20">
-                    Most Popular
-                  </div>
-                )}
-                <div className="bg-slate-950/80 rounded-[2.4rem] p-8 h-full flex flex-col">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${plan.color} flex items-center justify-center text-2xl mb-6 shadow-lg transition-transform group-hover:rotate-6`}>
-                    {plan.icon}
-                  </div>
-                  <h3 className="text-xl font-black text-white mb-1">{plan.name}</h3>
-                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-4">{plan.desc}</p>
-                  
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-4xl font-black text-white">{billingCycle === 'monthly' ? plan.price : plan.yearly}</span>
-                    <span className="text-slate-500 font-bold text-xs">/mo</span>
-                  </div>
-                  
-                  <div className="mb-8 p-3 rounded-2xl bg-white/5 border border-white/5 text-center">
-                    <span className="text-[#06E4DA] font-black text-lg block">{plan.credits}</span>
-                    <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">Monthly Credits</span>
-                  </div>
+      {/* 2. Detailed Comparison Matrix (Primary Section) */}
+      <section className="py-24 lg:py-32 overflow-hidden border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-[#06E4DA] font-black tracking-[0.4em] uppercase text-xs mb-4">Granular Breakdown</h2>
+            <h3 className="text-4xl sm:text-6xl font-black text-white mb-8">Compare All Plans</h3>
+            <p className="text-slate-500 max-w-2xl mx-auto">Deep dive into the specific features of each tier to find your perfect fit.</p>
+          </div>
 
-                  <ul className="space-y-4 flex-1 mb-8">
-                    {plan.features.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-600 mt-1.5 shrink-0"></div>
-                        <span className="text-slate-300 text-xs font-medium leading-relaxed">{feat}</span>
-                      </li>
+          <div className="glass-card rounded-[3rem] border-white/5 overflow-x-auto shadow-3xl">
+            <table className="w-full text-left min-w-[900px]">
+              <thead>
+                <tr className="bg-slate-950/80 border-b border-white/10">
+                  <th className="p-8 text-slate-500 font-black uppercase tracking-widest text-[11px] w-1/4">Feature Set</th>
+                  {plans.map((plan, i) => (
+                    <th key={i} className="p-8 text-center">
+                      <div className={`text-[12px] font-black uppercase tracking-widest mb-1 ${plan.recommended ? 'text-[#06E4DA]' : 'text-white'}`}>
+                        {plan.name}
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-bold tracking-tight">
+                        {billingCycle === 'monthly' ? plan.price : plan.yearly}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {comparisonData.map((category, catIdx) => (
+                  <React.Fragment key={catIdx}>
+                    <tr className="bg-white/[0.02]">
+                      <td colSpan={6} className="p-8">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] border-l-2 border-red-600 pl-4">
+                          {category.category}
+                        </span>
+                      </td>
+                    </tr>
+                    {category.features.map((feat, featIdx) => (
+                      <tr key={featIdx} className="group hover:bg-white/[0.03] transition-colors">
+                        <td className="p-8 text-slate-300 font-medium text-sm">
+                          {feat.name}
+                        </td>
+                        {feat.values.map((val, valIdx) => (
+                          <td key={valIdx} className="p-8 text-center text-sm">
+                            {typeof val === 'boolean' ? (
+                              val ? (
+                                <svg className="w-5 h-5 text-[#06E4DA] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : (
+                                <span className="text-slate-800">—</span>
+                              )
+                            ) : (
+                              <span className={`font-bold ${val === 'Unlimited' ? 'text-white' : 'text-slate-400'}`}>
+                                {val}
+                              </span>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
                     ))}
-                  </ul>
-
-                  <button className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${plan.recommended ? 'bg-[#06E4DA] hover:bg-[#00FFF5] text-slate-950 shadow-xl shadow-[#06E4DA]/20' : 'bg-white text-slate-950 hover:bg-slate-100'}`}>
-                    {plan.cta}
-                  </button>
-                </div>
-              </div>
-            ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

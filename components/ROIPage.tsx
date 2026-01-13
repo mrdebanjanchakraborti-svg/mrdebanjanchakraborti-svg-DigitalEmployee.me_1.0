@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 
+// Fix: Standardized onNavigate type across all page components
 interface ROIPageProps {
-  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi') => void;
+  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => void;
 }
 
 interface PricingTier {

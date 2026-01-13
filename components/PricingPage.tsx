@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 
+// Fix: Standardized onNavigate type across all page components
 interface PricingPageProps {
-  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner') => void;
+  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => void;
 }
 
 const PricingPage: React.FC<PricingPageProps> = ({ onNavigate }) => {
@@ -191,8 +192,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onNavigate }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {comparisonData.map((category, catIdx) => (
-                  <React.Fragment key={catIdx}>
+                {comparisonData.map((category, categoryIdx) => (
+                  <React.Fragment key={categoryIdx}>
                     <tr className="bg-white/[0.02]">
                       <td colSpan={6} className="p-8">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] border-l-2 border-red-600 pl-4">

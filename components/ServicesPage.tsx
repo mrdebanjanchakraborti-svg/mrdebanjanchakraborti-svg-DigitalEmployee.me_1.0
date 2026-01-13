@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 
+// Fix: Standardized onNavigate type across all page components
 interface ServicesPageProps {
-  onNavigate: (page: 'home' | 'about' | 'services') => void;
+  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => void;
 }
 
 const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {

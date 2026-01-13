@@ -1,8 +1,9 @@
 
 import React from 'react';
 
+// Fix: Updated onNavigate type in FooterProps to include 'reset-password'
 interface FooterProps {
-  onNavigate?: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi') => void;
+  onNavigate?: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => void;
   onOpenAuth?: (mode: 'login' | 'signup' | 'forgot' | 'update') => void;
   user?: any;
 }
@@ -56,7 +57,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAuth, user }) => {
     }
   ];
 
-  const handleLinkClick = (e: React.MouseEvent, page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi') => {
+  const handleLinkClick = (e: React.MouseEvent, page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => {
     if (onNavigate) {
       e.preventDefault();
       onNavigate(page);
@@ -107,7 +108,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAuth, user }) => {
             <ul className="space-y-4 text-slate-500 text-sm">
               {!user ? (
                 <>
-                  <li><button onClick={() => onOpenAuth?.('login')} className="hover:text-red-500 transition-colors">Login</button></li>
+                  <li><button onClick={() => onOpenAuth?.('login')} className="hover:text-red-500 transition-colors">Login / Portal</button></li>
                 </>
               ) : (
                 <li><a href="#" className="hover:text-red-500 transition-colors">My Dashboard</a></li>

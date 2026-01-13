@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 
+// Fix: Updated HeaderProps to include missing 'reset-password' navigation/page types and 'forgot'/'update' auth modes
 interface HeaderProps {
   onOpenVoice: () => void;
-  onOpenAuth: (mode: 'login' | 'signup') => void;
+  onOpenAuth: (mode: 'login' | 'signup' | 'forgot' | 'update') => void;
   onLogout: () => void;
   user: any;
-  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi') => void;
-  currentPage: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi';
+  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => void;
+  currentPage: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password';
 }
 
 const Header: React.FC<HeaderProps> = ({ onOpenVoice, onOpenAuth, onLogout, user, onNavigate, currentPage }) => {

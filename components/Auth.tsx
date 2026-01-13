@@ -24,6 +24,8 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
       setMode(initialMode);
       setError(null);
       setMessage(null);
+      setPassword('');
+      setConfirmPassword('');
     }
   }, [isOpen, initialMode]);
 
@@ -42,7 +44,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
 
   const strength = getPasswordStrength(password);
   const strengthColors = ['bg-slate-800', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-emerald-500'];
-  const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  const strengthLabels = ['', 'Insecure', 'Moderate', 'Secure', 'Elite'];
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +65,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
           },
         });
         if (signUpError) throw signUpError;
-        setMessage('Verification email sent! Please check your inbox.');
+        setMessage('Neural handshake initiated. Check your inbox for the verification uplink.');
       } else if (mode === 'login') {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -76,13 +78,13 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
           redirectTo: window.location.origin + '/#reset-password',
         });
         if (resetError) throw resetError;
-        setMessage('Neural recovery link dispatched. Please check your inbox and click the secure link to update your credentials.');
+        setMessage('Neural recovery link dispatched. Check your inbox to restore system access.');
       } else if (mode === 'update') {
         if (password !== confirmPassword) {
-          throw new Error("Passwords do not match.");
+          throw new Error("Credentials do not match.");
         }
         if (password.length < 6) {
-          throw new Error("Security policy: Minimum 6 characters required.");
+          throw new Error("Security protocol: Minimum 6 characters required.");
         }
         const { error: updateError } = await supabase.auth.updateUser({
           password: password
@@ -104,6 +106,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl animate-fade-in">
       <div className="glass-card w-full max-w-md rounded-[2.5rem] border-white/10 shadow-2xl relative overflow-hidden">
+        {/* Dynamic Background Glow */}
         <div className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-20 transition-all duration-700 ${mode === 'update' ? 'bg-emerald-500' : mode === 'forgot' ? 'bg-red-500' : accountType === 'business' ? 'bg-red-600' : 'bg-cyan-500'}`}></div>
 
         <button 
@@ -118,7 +121,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
         <div className="p-10">
           <div className="text-center mb-10">
             {mode === 'update' ? (
-              <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-500">
+              <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
                 <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -132,17 +135,18 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
             ) : null}
 
             <h2 className="text-3xl font-black text-white mb-2 tracking-tighter uppercase">
-              {mode === 'login' ? 'Welcome Back' : 
-               mode === 'signup' ? 'Join the Workforce' : 
-               mode === 'forgot' ? 'Reset Password' : 'New Credentials'}
+              {mode === 'login' ? 'Gateway Access' : 
+               mode === 'signup' ? 'New Deployment' : 
+               mode === 'forgot' ? 'Recovery Protocol' : 'Sync Credentials'}
             </h2>
             <p className="text-slate-500 text-sm font-medium">
-              {mode === 'login' ? 'Access your Neural Dashboard' : 
-               mode === 'signup' ? 'Deploy your first Digital Employee' : 
-               mode === 'forgot' ? 'Enter your email for a recovery link' : 'Securely update your system access key'}
+              {mode === 'login' ? 'Authenticate your Neural Identity' : 
+               mode === 'signup' ? 'Provision your high-ROI workspace' : 
+               mode === 'forgot' ? 'Request a neural bypass link' : 'Update your system access keys'}
             </p>
           </div>
 
+          {/* Account Type Toggle (Signup only) */}
           {mode === 'signup' && (
             <div className="flex p-1 bg-slate-900/50 rounded-2xl mb-8 border border-white/5">
               <button 
@@ -177,7 +181,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
             
             {mode !== 'update' && !message && (
               <div className="animate-fade-in">
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Work Email</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Secure Email</label>
                 <input 
                   required
                   type="email" 
@@ -193,7 +197,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
               <div className="animate-fade-in">
                 <div className="flex justify-between items-center mb-2 ml-1">
                   <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                    {mode === 'update' ? 'New Password' : 'Secret Key (Password)'}
+                    {mode === 'update' ? 'New Secret Key' : 'Secret Key'}
                   </label>
                   {mode === 'login' && (
                     <button 
@@ -201,7 +205,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
                       onClick={() => setMode('forgot')}
                       className="text-[9px] text-red-500 font-bold uppercase tracking-tight hover:text-red-400 transition-colors"
                     >
-                      Forgot?
+                      Bypass? (Forgot)
                     </button>
                   )}
                 </div>
@@ -214,11 +218,12 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
                   className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-red-500 transition-colors text-sm"
                 />
                 
+                {/* Password Strength Indicator */}
                 {(mode === 'signup' || mode === 'update') && password.length > 0 && (
-                  <div className="mt-3 animate-fade-in">
-                    <div className="flex justify-between items-center mb-1.5 px-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Security Strength</span>
-                      <span className={`text-[9px] font-black uppercase tracking-widest ${
+                  <div className="mt-3 animate-fade-in px-1">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Neural Security Rating</span>
+                      <span className={`text-[8px] font-black uppercase tracking-widest ${
                         strength <= 1 ? 'text-red-500' : strength <= 2 ? 'text-orange-500' : strength <= 3 ? 'text-yellow-500' : 'text-emerald-500'
                       }`}>
                         {strengthLabels[strength]}
@@ -228,7 +233,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
                       {[1, 2, 3, 4].map((step) => (
                         <div 
                           key={step} 
-                          className={`flex-1 rounded-full transition-all duration-500 ${step <= strength ? strengthColors[strength] : 'bg-slate-800'}`}
+                          className={`flex-1 rounded-full transition-all duration-500 ${step <= strength ? strengthColors[strength] : 'bg-slate-900'}`}
                         />
                       ))}
                     </div>
@@ -239,7 +244,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
 
             {mode === 'update' && (
               <div className="animate-fade-in">
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Confirm New Password</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Confirm Secret Key</label>
                 <input 
                   required
                   type="password" 
@@ -260,13 +265,13 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
             {message && (
               <div className="p-6 rounded-3xl bg-green-500/10 border border-green-500/20 animate-fade-in text-center space-y-4">
                 <p className="text-green-500 text-xs font-bold uppercase tracking-widest leading-relaxed">{message}</p>
-                {mode === 'forgot' && (
+                {(mode === 'forgot' || mode === 'signup') && (
                    <button 
                     type="button"
                     onClick={() => { setMode('login'); setMessage(null); }}
                     className="text-[10px] text-white font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-xl hover:bg-white/10 transition-all"
                    >
-                     Back to Login
+                     Back to Gateway
                    </button>
                 )}
               </div>
@@ -285,18 +290,18 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
                   </svg>
                 )}
                 {loading ? 'Processing...' : 
-                 mode === 'login' ? 'Unlock Dashboard' : 
-                 mode === 'signup' ? 'Create Account' : 
-                 mode === 'forgot' ? 'Request Recovery Link' : 'Securely Update Password'}
+                 mode === 'login' ? 'Authenticate' : 
+                 mode === 'signup' ? 'Initiate Deployment' : 
+                 mode === 'forgot' ? 'Request Recovery' : 'Sync New Credentials'}
               </button>
             )}
           </form>
 
           <div className="mt-10 text-center border-t border-white/5 pt-8">
             <p className="text-slate-500 text-xs font-medium">
-              {mode === 'login' ? "Don't have an account?" : 
-               mode === 'signup' ? "Already have an account?" : 
-               "Return to secure entrance?"}
+              {mode === 'login' ? "New business objective?" : 
+               mode === 'signup' ? "Existing neural profile?" : 
+               "Return to gateway entrance?"}
               <button 
                 onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setMessage(null); }}
                 className="ml-2 text-white font-black uppercase tracking-tighter hover:underline transition-all"
@@ -310,7 +315,7 @@ const Auth: React.FC<AuthProps> = ({ isOpen, onClose, initialMode = 'login' }) =
         <div className="p-6 bg-slate-900/50 text-center">
           <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.9L10 9.503l7.834-4.603A2 2 0 0016 4H4a2 2 0 00-1.834.9zM2 6.571v5.428a2 2 0 001.243 1.848l6.257 3.682a1 1 0 001 0l6.257-3.682A2 2 0 0018 12V6.571l-7.53 4.429a1 1 0 01-.94 0L2 6.571z" clipRule="evenodd" /></svg>
-            Silicon Valley Standard Encryption
+            Silicon Valley Standard Encryption Enabled
           </span>
         </div>
       </div>

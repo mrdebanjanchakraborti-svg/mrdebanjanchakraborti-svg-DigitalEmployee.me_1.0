@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabase';
 
-// Replace with your actual Google Apps Script Web App URL from Step 1
 const GOOGLE_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycby5tXf8_R6Z-I_YqG-x_L-Y8_Z_Z_Z_Z_Z/exec';
 
+// Fix: Standardized onNavigate type across all page components
 interface PartnerPageProps {
-  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner') => void;
+  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => void;
 }
 
 const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
@@ -82,7 +82,6 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
     e.preventDefault();
     setLoading(true);
 
-    const appliedAt = new Date().toISOString();
     const payload = {
       full_name: formData.fullName,
       email: formData.email,
@@ -90,31 +89,27 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
       city: formData.city,
       category: formData.category,
       status: 'pending',
-      applied_at: appliedAt
+      created_at: new Date().toISOString()
     };
 
     try {
       // 1. Save to Supabase
-      const { error } = await supabase
+      const { error: sqlError } = await supabase
         .from('partners')
         .insert([payload]);
 
-      if (error) throw error;
+      if (sqlError) {
+        console.error('Partner Deployment Error:', sqlError);
+        throw new Error(`Database error: ${sqlError.message}`);
+      }
 
       // 2. Sync to Google Sheets
-      await syncToGoogleSheet({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        category: formData.category,
-        appliedAt: appliedAt
-      });
+      await syncToGoogleSheet(payload);
 
       setFormSubmitted(true);
-    } catch (err) {
-      console.error('Partner submission error:', err);
-      alert('There was an error submitting your partner application.');
+    } catch (err: any) {
+      console.error('Partner application failed:', err);
+      alert(err.message || 'There was an error submitting your partner application. Please verify the backend schema initialization.');
     } finally {
       setLoading(false);
     }
@@ -122,7 +117,7 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
 
   return (
     <div className="animate-fade-in bg-[#071027]">
-      {/* 1. Hero Section */}
+      {/* Hero Section */}
       <section className="relative pt-32 pb-24 lg:pt-52 lg:pb-40 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(108,40,255,0.08)_0,transparent_70%)]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -133,10 +128,10 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
           </div>
           
           <h1 className="flex flex-col items-center text-[52px] sm:text-7xl lg:text-[110px] font-black leading-[1] tracking-tighter mb-10">
-            <span className="text-white">Partner With Us</span>
-            <span className="text-red-500 mt-2">— Bring the</span>
-            <span className="text-red-500">Digital</span>
-            <span className="text-red-500">Workforce.</span>
+            <span className="text-white">Neural Partnership</span>
+            <span className="text-red-500 mt-2">— Scalable</span>
+            <span className="text-red-500">Autonomous</span>
+            <span className="text-red-500">Wealth.</span>
           </h1>
 
           <p className="text-xl sm:text-2xl text-slate-400 max-w-3xl mx-auto mb-16 font-light leading-relaxed">
@@ -157,27 +152,7 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* 2. Why Partner? */}
-      <section className="py-24 bg-slate-950/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: "📈", title: "High-Demand AI Service", desc: "Every business needs automation. You are selling the future, not just software." },
-              { icon: "📦", title: "Zero Inventory", desc: "No physical stock, no shipping, no logistics. Just pure digital value." },
-              { icon: "💰", title: "Lifetime Recurring Income", desc: "You earn a share of every renewal and wallet recharge, forever." },
-              { icon: "🤝", title: "Dedicated Support", desc: "Training, marketing assets, and white-label options you need to succeed." }
-            ].map((item, i) => (
-              <div key={i} className="glass-card p-10 rounded-3xl border-white/5 hover:border-red-500/20 transition-all hover:-translate-y-2 text-center">
-                <div className="text-4xl mb-6">{item.icon}</div>
-                <h4 className="text-lg font-bold text-white mb-4 leading-tight">{item.title}</h4>
-                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Commission Structure */}
+      {/* Commission Structure */}
       <section className="py-24 lg:py-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
@@ -216,101 +191,7 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* 4. Who Is This For? */}
-      <section className="py-24 bg-slate-950/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {[
-              { title: "Marketing Agencies", desc: "Upsell automation to your existing clients." },
-              { title: "Freelancers & Consultants", desc: "Add a high-margin revenue stream to your services." },
-              { title: "Software Developers", desc: "Offer a Done-For-You workforce without building from scratch." },
-              { title: "Business Trainers", desc: "Help your students automate their operations." }
-            ].map((item, i) => (
-              <div key={i} className="flex gap-6">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 shrink-0"></div>
-                <div>
-                  <h5 className="text-white font-bold mb-2">{item.title}</h5>
-                  <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Dashboard Preview */}
-      <section className="py-24 lg:py-32">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-5xl font-black text-white mb-6 tracking-tight">Total Transparency. Real-Time Data.</h2>
-          <p className="text-slate-400 mb-16 max-w-2xl mx-auto">Our enterprise-grade Partner Portal gives you instant visibility into your business.</p>
-          
-          <div className="glass-card rounded-[3rem] p-4 border-white/10 shadow-2xl relative">
-            <div className="bg-slate-900 rounded-[2.5rem] overflow-hidden aspect-video relative flex flex-col">
-              {/* Fake UI Header */}
-              <div className="bg-slate-950 p-6 flex justify-between items-center border-b border-white/5">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
-                </div>
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Partner Intelligence Dashboard</div>
-                <div className="w-8 h-8 rounded-full bg-slate-800"></div>
-              </div>
-              {/* Fake UI Body */}
-              <div className="flex-1 p-8 grid grid-cols-3 gap-6">
-                <div className="col-span-2 space-y-6">
-                  <div className="h-40 bg-slate-950/50 rounded-2xl border border-white/5 flex items-center justify-center">
-                    <div className="w-[80%] h-[40%] flex items-end gap-2">
-                      {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
-                        <div key={i} className="flex-1 bg-gradient-to-t from-[#6C28FF] to-[#06E4DA] rounded-t-sm" style={{ height: `${h}%` }}></div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="h-24 bg-slate-950/50 rounded-2xl border border-white/5 p-4 text-left">
-                      <div className="text-[8px] text-slate-500 uppercase font-black">Total Payout</div>
-                      <div className="text-xl font-black text-white mt-1">₹1,42,500</div>
-                    </div>
-                    <div className="h-24 bg-slate-950/50 rounded-2xl border border-white/5 p-4 text-left">
-                      <div className="text-[8px] text-slate-500 uppercase font-black">Active Referrals</div>
-                      <div className="text-xl font-black text-white mt-1">34</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-slate-950/50 rounded-2xl border border-white/5 p-6 space-y-4">
-                  <div className="text-[8px] text-slate-500 uppercase font-black text-left">Recent Transactions</div>
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="flex justify-between items-center py-2 border-b border-white/5">
-                      <div className="w-6 h-6 rounded-full bg-slate-800"></div>
-                      <div className="w-16 h-2 bg-slate-800 rounded-full"></div>
-                      <div className="text-[#06E4DA] text-[10px] font-bold">+₹4,500</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-12 mt-16 text-left">
-            <div>
-              <h5 className="text-white font-bold mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 rounded-lg bg-[#6C28FF]/20 flex items-center justify-center text-[#6C28FF] text-xs">📊</span>
-                Live Reporting
-              </h5>
-              <p className="text-slate-500 text-sm leading-relaxed">Track Referred Customer Signups and Order History in real-time.</p>
-            </div>
-            <div>
-              <h5 className="text-white font-bold mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center text-red-600 text-xs">💸</span>
-                Commission Tracking
-              </h5>
-              <p className="text-slate-500 text-sm leading-relaxed">See exactly how much you’ve earned from Signups, Renewals, and Wallet Recharges.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Apply Now Form */}
+      {/* Apply Now Form */}
       <section id="apply-form" className="py-24 lg:py-32 bg-[#020617] relative border-t border-white/5">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="glass-card p-12 rounded-[3rem] border-white/10 relative overflow-hidden">
@@ -321,14 +202,14 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
                 <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded-3xl flex items-center justify-center mx-auto mb-8 animate-bounce">
                   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
-                <h3 className="text-4xl font-black text-white mb-4">Application Sent!</h3>
-                <p className="text-slate-400 font-medium">Our partnership team will review your profile and contact you within 24 hours.</p>
+                <h3 className="text-4xl font-black text-white mb-4 uppercase tracking-tight">Handshake Received</h3>
+                <p className="text-slate-400 font-medium">Our partnership team will review your profile and contact you within 24 hours to sync objectives.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="text-center mb-10">
-                  <h3 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">Ready to Start Earning?</h3>
-                  <p className="text-slate-500 font-medium text-sm">Fill out your profile to request access to the Partner Portal.</p>
+                  <h3 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">Initiate Partnership</h3>
+                  <p className="text-slate-500 font-medium text-sm">Provision your neural profile to request access to the Partner Portal.</p>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-6">
@@ -337,28 +218,28 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
                     <input required name="fullName" value={formData.fullName} onChange={handleChange} type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Email ID</label>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Identity</label>
                     <input required name="email" value={formData.email} onChange={handleChange} type="email" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">WhatsApp Number</label>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">WhatsApp / Signal</label>
                     <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">City / Pin Code</label>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">City / Location</label>
                     <input required name="city" value={formData.city} onChange={handleChange} type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">I am a...</label>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Primary Industry / Expertise</label>
                   <select required name="category" value={formData.category} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-[#6C28FF] transition-colors">
                     <option value="">Select Category</option>
                     <option>Marketing Agency</option>
-                    <option>Freelancer</option>
+                    <option>Freelancer / Solo-Architect</option>
                     <option>Business Consultant</option>
                     <option>Software Developer</option>
                     <option>Other</option>
@@ -370,7 +251,7 @@ const PartnerPage: React.FC<PartnerPageProps> = ({ onNavigate }) => {
                   disabled={loading}
                   className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900 text-white py-6 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-red-600/20 active:scale-95 flex items-center justify-center"
                 >
-                  {loading ? 'Processing...' : 'Submit Application'}
+                  {loading ? 'Processing Protocol...' : 'Submit Application'}
                 </button>
                 <p className="text-[10px] text-slate-600 text-center mt-6 font-bold uppercase tracking-widest">
                   Secure Onboarding • partners@digitalemployee.me

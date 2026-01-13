@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabase';
 
-// Replace with your actual Google Apps Script Web App URL from Step 1
+// Replace with your actual Google Apps Script Web App URL
 const GOOGLE_SHEET_SYNC_URL = 'https://script.google.com/macros/s/AKfycby5tXf8_R6Z-I_YqG-x_L-Y8_Z_Z_Z_Z_Z/exec';
 
 const Contact: React.FC = () => {
@@ -26,10 +26,9 @@ const Contact: React.FC = () => {
 
   const syncToGoogleSheet = async (data: any) => {
     try {
-      // Use no-cors mode if the script is simple, or standard fetch for full response
       await fetch(GOOGLE_SHEET_SYNC_URL, {
         method: 'POST',
-        mode: 'no-cors', // Redirects in Google Apps Script often trigger CORS issues in browser
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, sheetType: 'contact' })
       });
@@ -42,7 +41,7 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     
-    const submittedAt = new Date().toISOString();
+    // We use snake_case to match Postgres standard naming conventions
     const payload = {
       full_name: formData.fullName,
       email: formData.email,
@@ -52,34 +51,27 @@ const Contact: React.FC = () => {
       company: formData.company,
       interest: formData.interest,
       requirements: formData.requirements,
-      submitted_at: submittedAt
+      created_at: new Date().toISOString()
     };
 
     try {
       // 1. Save to Supabase
-      const { error } = await supabase
+      const { error: sqlError } = await supabase
         .from('contacts')
         .insert([payload]);
 
-      if (error) throw error;
+      if (sqlError) {
+        console.error('Supabase SQL Error Details:', sqlError);
+        throw new Error(`Database error: ${sqlError.message}`);
+      }
 
-      // 2. Sync to Google Sheets
-      await syncToGoogleSheet({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        industry: formData.industry,
-        company: formData.company,
-        interest: formData.interest,
-        requirements: formData.requirements,
-        submittedAt: submittedAt
-      });
+      // 2. Sync to Google Sheets (Optional secondary sync)
+      await syncToGoogleSheet(payload);
 
       setSubmitted(true);
-    } catch (err) {
-      console.error('Submission error:', err);
-      alert('There was an error submitting your request. Please try again.');
+    } catch (err: any) {
+      console.error('Submission audit failed:', err);
+      alert(err.message || 'There was an error submitting your request. Please ensure the database schema is correctly initialized.');
     } finally {
       setLoading(false);
     }
@@ -97,7 +89,7 @@ const Contact: React.FC = () => {
             <div className="lg:col-span-2 p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-slate-900 to-slate-950 flex flex-col justify-center border-r border-white/5">
               <div className="mb-10">
                 <span className="bg-red-600/10 text-red-500 text-[10px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full border border-red-500/20">
-                  Secure Deployment
+                  Secure Deployment Hub
                 </span>
               </div>
               <h2 className="text-4xl sm:text-5xl font-black text-white mb-8 leading-[1.1] tracking-tighter">
@@ -122,7 +114,7 @@ const Contact: React.FC = () => {
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-500 uppercase tracking-widest font-black">SLA Response Time</div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-widest font-black">SLA Response Guarantee</div>
                     <div className="text-lg font-bold text-white tracking-tight">Under 4 Hours</div>
                   </div>
                 </div>
@@ -136,8 +128,8 @@ const Contact: React.FC = () => {
                   <div className="w-24 h-24 bg-green-500/10 text-green-500 rounded-3xl flex items-center justify-center mb-8 shadow-2xl shadow-green-500/20">
                     <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                   </div>
-                  <h3 className="text-4xl font-black text-white mb-4 uppercase tracking-tighter">Request Received</h3>
-                  <p className="text-slate-400 font-medium max-w-sm">Our AI Architects are reviewing your company's digital footprint. A specialist will reach out shortly.</p>
+                  <h3 className="text-4xl font-black text-white mb-4 uppercase tracking-tighter">Audit Initiated</h3>
+                  <p className="text-slate-400 font-medium max-w-sm">Our AI Architects are reviewing your company's digital footprint. A specialist will reach out shortly to schedule the node sync.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-8">
@@ -157,15 +149,15 @@ const Contact: React.FC = () => {
                   {/* Row 2: Lead Segmentation Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-1">
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Mobile (with Country Code)</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Secure Phone</label>
                       <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" placeholder="+91 98765 43210" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
                     </div>
                     <div className="md:col-span-1">
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">City</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">City / Pin Code</label>
                       <input required name="city" value={formData.city} onChange={handleChange} type="text" placeholder="e.g. Mumbai, New York" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
                     </div>
                     <div className="md:col-span-1">
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Select Industry</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Market Sector</label>
                       <div className="relative">
                         <select required name="industry" value={formData.industry} onChange={handleChange} className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium appearance-none">
                           <option value="">Choose Sector</option>
@@ -188,11 +180,11 @@ const Contact: React.FC = () => {
                   {/* Row 3: Business Context */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Company Name</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Organization Name</label>
                       <input required name="company" value={formData.company} onChange={handleChange} type="text" placeholder="Company Ltd." className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium placeholder:text-slate-800" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Plan of Interest</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Tier Preference</label>
                       <select required name="interest" value={formData.interest} onChange={handleChange} className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-red-500 transition-all font-medium appearance-none">
                         <option value="">Select Tier</option>
                         <option>Starter (₹2,500/mo)</option>
@@ -205,7 +197,7 @@ const Contact: React.FC = () => {
 
                   {/* Row 4: Preferences */}
                   <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Workflow Requirements / Pain Points</label>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Workflow Requirements / Neural Mapping</label>
                     <textarea name="requirements" value={formData.requirements} onChange={handleChange} placeholder="e.g. Need WhatsApp automation for clinic recalls, or lead scoring for property inquiries..." className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-5 text-white focus:outline-none focus:border-red-500 transition-all h-32 resize-none font-medium placeholder:text-slate-800"></textarea>
                   </div>
 
@@ -217,13 +209,13 @@ const Contact: React.FC = () => {
                     {loading ? (
                       <span className="flex items-center gap-3">
                         <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        Processing Submission...
+                        Authenticating Payload...
                       </span>
-                    ) : 'Schedule Audit Session'}
+                    ) : 'Provision Audit Session'}
                   </button>
 
                   <p className="text-[10px] text-slate-600 text-center font-bold uppercase tracking-widest border-t border-white/5 pt-6">
-                    Direct Sync with InFlow Revenue OS • ISO 27001 Cloud Standard
+                    Direct Sync with DigitalEmployee.me Revenue OS • ISO 27001 Cloud Standard
                   </p>
                 </form>
               )}

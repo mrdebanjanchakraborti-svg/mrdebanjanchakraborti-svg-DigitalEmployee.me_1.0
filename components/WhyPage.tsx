@@ -1,8 +1,9 @@
 
 import React from 'react';
 
+// Fix: Standardized onNavigate type across all page components
 interface WhyPageProps {
-  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi') => void;
+  onNavigate: (page: 'home' | 'about' | 'services' | 'why' | 'pricing' | 'partner' | 'roi' | 'reset-password') => void;
 }
 
 const WhyPage: React.FC<WhyPageProps> = ({ onNavigate }) => {

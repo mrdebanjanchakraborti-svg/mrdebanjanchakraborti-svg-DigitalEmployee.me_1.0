@@ -12,9 +12,7 @@ const Contact: React.FC = () => {
     city: '',
     industry: '',
     company: '',
-    website: '',
     interest: '',
-    contactTime: '',
     requirements: ''
   });
 
@@ -37,9 +35,7 @@ const Contact: React.FC = () => {
           city: formData.city,
           industry: formData.industry,
           company: formData.company,
-          website: formData.website,
           interest: formData.interest,
-          contact_time: formData.contactTime,
           requirements: formData.requirements,
           submitted_at: new Date().toISOString()
         }]);
@@ -123,7 +119,7 @@ const Contact: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Row 2: Lead Segmentation Fields (Requested) */}
+                  {/* Row 2: Lead Segmentation Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-1">
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Mobile (with Country Code)</label>
